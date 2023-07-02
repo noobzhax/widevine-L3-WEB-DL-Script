@@ -23,24 +23,25 @@ with open("keys.json") as json_data:
     config = json.load(json_data)
     json_mpd_url = config[0]['mpd_url']
     try:
-        keys = ""
-        for i in range(1, len(config)):
-            keys += f"--key {config[i]['kid']}:{config[i]['hex_key']} "
+        keys = "".join(
+            f"--key {config[i]['kid']}:{config[i]['hex_key']} "
+            for i in range(1, len(config))
+        )
     except:
-        keys = ""
-        for i in range(1, len(config)-1):
-            keys += f"--key {config[i]['kid']}:{config[i]['hex_key']} "
-
+        keys = "".join(
+            f"--key {config[i]['kid']}:{config[i]['hex_key']} "
+            for i in range(1, len(config) - 1)
+        )
 currentFile = __file__
 realPath = os.path.realpath(currentFile)
 dirPath = os.path.dirname(realPath)
 dirName = os.path.basename(dirPath)
 
-youtubedlexe = dirPath + '/binaries/yt-dlp.exe'
-aria2cexe = dirPath + '/binaries/aria2c.exe'
-mp4decryptexe = dirPath + '/binaries/mp4decrypt_new.exe'
-mkvmergeexe = dirPath + '/binaries/mkvmerge.exe'
-SubtitleEditexe = dirPath + '/binaries/SubtitleEdit.exe'
+youtubedlexe = f'{dirPath}/binaries/yt-dlp.exe'
+aria2cexe = f'{dirPath}/binaries/aria2c.exe'
+mp4decryptexe = f'{dirPath}/binaries/mp4decrypt_new.exe'
+mkvmergeexe = f'{dirPath}/binaries/mkvmerge.exe'
+SubtitleEditexe = f'{dirPath}/binaries/SubtitleEdit.exe'
 
 # mpdurl = str(args.mpd)
 output = str(args.output)
@@ -68,15 +69,66 @@ subprocess.run(f'{mp4decryptexe} --show-progress {keys} encrypted.mp4 decrypted.
 if args.subtitle:
     subprocess.run(f'{aria2cexe} {subtitle}', shell=True)
     os.system('ren *.xml en.xml')
-    subprocess.run(f'{SubtitleEditexe} /convert en.xml srt', shell=True) 
+    subprocess.run(f'{SubtitleEditexe} /convert en.xml srt', shell=True)
     print("Merging .....")
-    subprocess.run([mkvmergeexe, '--ui-language' ,'en', '--output', output +'.mkv', '--language', '0:eng', '--default-track', '0:yes', '--compression', '0:none', 'decrypted.mp4', '--language', '0:eng', '--default-track', '0:yes', '--compression' ,'0:none', 'decrypted.m4a','--language', '0:eng','--track-order', '0:0,1:0,2:0,3:0,4:0', 'en.srt'])
-    print("\nAll Done .....")
+    subprocess.run(
+        [
+            mkvmergeexe,
+            '--ui-language',
+            'en',
+            '--output',
+            f'{output}.mkv',
+            '--language',
+            '0:eng',
+            '--default-track',
+            '0:yes',
+            '--compression',
+            '0:none',
+            'decrypted.mp4',
+            '--language',
+            '0:eng',
+            '--default-track',
+            '0:yes',
+            '--compression',
+            '0:none',
+            'decrypted.m4a',
+            '--language',
+            '0:eng',
+            '--track-order',
+            '0:0,1:0,2:0,3:0,4:0',
+            'en.srt',
+        ]
+    )
 else:
     print("Merging .....")
-    subprocess.run([mkvmergeexe, '--ui-language' ,'en', '--output', output +'.mkv', '--language', '0:eng', '--default-track', '0:yes', '--compression', '0:none', 'decrypted.mp4', '--language', '0:eng', '--default-track', '0:yes', '--compression' ,'0:none', 'decrypted.m4a','--language', '0:eng','--track-order', '0:0,1:0,2:0,3:0,4:0'])
-    print("\nAll Done .....")    
-
+    subprocess.run(
+        [
+            mkvmergeexe,
+            '--ui-language',
+            'en',
+            '--output',
+            f'{output}.mkv',
+            '--language',
+            '0:eng',
+            '--default-track',
+            '0:yes',
+            '--compression',
+            '0:none',
+            'decrypted.mp4',
+            '--language',
+            '0:eng',
+            '--default-track',
+            '0:yes',
+            '--compression',
+            '0:none',
+            'decrypted.m4a',
+            '--language',
+            '0:eng',
+            '--track-order',
+            '0:0,1:0,2:0,3:0,4:0',
+        ]
+    )
+print("\nAll Done .....")
 print("\nDo you want to delete the Encrypted Files : Press 1 for yes , 2 for no")
 delete_choice = int(input("Enter Response : "))
 
@@ -89,5 +141,3 @@ if delete_choice == 1:
         os.remove("en.srt")
     except:
         pass
-else:
-    pass
